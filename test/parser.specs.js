@@ -423,6 +423,17 @@ describe('odata.parser grammar', function () {
         assert.equal(ast.$filter.left.name, "_first_name");
     });
 
+    it('should accept an identifier with a whitespace in it', function () {
+        var ast = parser.parse("$filter=first%20name eq 'John'");
+        assert.equal(ast.$filter.left.name, "first name");
+    });
+
+    it('should accept an identifier with a whitespace in navigation properties', function () {
+        var ast = parser.parse("$filter=nav_property/first%20name eq 'John'");
+        assert.equal(ast.$filter.left.name, "nav_property/first name");
+
+    });
+
     // it('xxxxx', function () {
     //     var ast = parser.parse("$top=2&$filter=Date gt datetime'2012-09-27T21:12:59'");
 

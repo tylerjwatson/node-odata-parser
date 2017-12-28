@@ -101,12 +101,12 @@ dateTimeOffsetBody          =   a:dateTimeBody "Z" { return a + "Z"; } /
                                 a:dateTimeBody b:sign c:zeroToTwelve ":" d:zeroToSixty { return a + b + c + ":" + d; } /
                                 a:dateTimeBody b:sign c:zeroToTwelve { return a + b + c; }
 
-decimal                     =  sign:sign? digit:DIGIT+ "." decimal:DIGIT+ ("M"/"m")? { return sign + digit.join('') + '.' + decimal.join(''); } /
-                               sign:sign? digit:DIGIT+ ("M"/"m") { return sign + digit.join(''); }
+decimal                     =  sign:sign? digit:DIGIT+ "." decimal:DIGIT+ ("M"/"m")? { return [sign, digit.join(''), '.', decimal.join('')].join(''); } /
+                               sign:sign? digit:DIGIT+ ("M"/"m") { return [sign, digit.join('')].join(''); }
 
-double                      =  sign:sign? digit:DIGIT "." decimal:DIGIT+ ("e" / "E") signexp:sign? exp:DIGIT+ ("D" / "d")? { return sign + digit + '.' + decimal.join('') + 'e' + signexp + exp.join(''); } /
-                               sign:sign? digit:DIGIT+ "." decimal:DIGIT+ ("D" / "d") { return sign + digit.join('') + '.' + decimal.join(''); } /
-                               sign:sign? digit:DIGIT+ ("D" / "d") { return sign + digit.join(''); } /
+double                      =  sign:sign? digit:DIGIT "." decimal:DIGIT+ ("e" / "E") signexp:sign? exp:DIGIT+ ("D" / "d")? { return [sign, digit, '.', decimal.join(''), 'e', signexp, exp.join('')].join(''); } /
+                               sign:sign? digit:DIGIT+ "." decimal:DIGIT+ ("D" / "d") { return [sign, digit.join(''), '.', decimal.join('')].join(''); } /
+                               sign:sign? digit:DIGIT+ ("D" / "d") { return [sign, digit.join('')].join(''); } /
                                nanInfinity ("D" / "d")?
 
 guid                        =   "guid" SQUOTE HEXDIG8 "-" HEXDIG4 "-" HEXDIG4 "-" HEXDIG8 HEXDIG4 SQUOTE
@@ -172,13 +172,13 @@ nanInfinity                 =   nan / negativeInfinity / positiveInfinity
  * OData identifiers
  */
 
-unreserved                  = a:[a-zA-Z0-9-_]+ { return a.join(''); }
+unreserved                  = a:[a-zA-Z0-9-_%]+ { return decodeURIComponent(a.join('')); }
 validstring                 = a:([^']/escapedQuote)* { return a.join('').replace(/('')/g, "'"); }
 escapedQuote                = a:"''" { return a; }
-identifierPart              = a:[_a-zA-Z] b:unreserved? { return a + b; }
+identifierPart              = a:[_a-zA-Z] b:unreserved? { return [a, b].join(''); }
 identifier                  =
                                 a:identifierPart list:("." i:identifier {return i;})? {
-                                    if (list === "") list = [];
+                                    if (!list) list = [];
                                     if (require('util').isArray(list[0])) {
                                         list = list[0];
                                     }
@@ -205,7 +205,7 @@ expand                      =   "$expand=" list:expandList { return { "$expand":
                             /   "$expand=" .* { return {"error": 'invalid $expand parameter'}; }
 
 expandList                  =   i:identifierPath list:("," WSP? l:expandList {return l;})? {
-                                    if (list === "") list = [];
+                                    if (!list) list = [];
                                     if (require('util').isArray(list[0])) {
                                         list = list[0];
                                     }
@@ -231,12 +231,12 @@ orderby                     =   "$orderby=" list:orderbyList {
 
 orderbyList                 = i:(id:identifier ord:(WSP ("asc"/"desc"))? {
                                     var result = {};
-                                    result[id] = ord[1] || 'asc';
+                                    result[id] = (ord || [])[1] || 'asc';
                                     return result;
                                 })
                               list:("," WSP? l:orderbyList{return l;})? {
 
-                                    if (list === "") list = [];
+                                    if (!list) list = [];
                                     if (require('util').isArray(list[0])) {
                                         list = list[0];
                                     }
@@ -249,15 +249,16 @@ select                      =   "$select=" list:selectList { return { "$select":
                             /   "$select=" .* { return {"error": 'invalid $select parameter'}; }
 
 identifierPathParts         =   "/" i:identifierPart list:identifierPathParts? {
+                                    if (!list) list = [];
                                     if (require('util').isArray(list[0])) {
                                         list = list[0];
                                     }
                                     return "/" + i + list;
                                 }
-identifierPath              =   a:identifier b:identifierPathParts? { return a + b; }
+identifierPath              =   a:identifier b:identifierPathParts? { return [a, b].join(''); }
 selectList                  =
-                                i:(a:identifierPath b:".*"?{return a + b;}/"*") list:("," WSP? l:selectList {return l;})? {
-                                    if (list === "") list = [];
+                                i:(a:identifierPath b:".*"?{return [a, b].join('');}/"*") list:("," WSP? l:selectList {return l;})? {
+                                    if (!list) list = [];
                                     if (require('util').isArray(list[0])) {
                                         list = list[0];
                                     }
