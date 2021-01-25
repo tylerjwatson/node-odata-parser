@@ -77,5 +77,5 @@ declare class peg$SyntaxError {
 declare namespace peg$SyntaxError {
   function buildMessage(expected: any, found: any): string;
 }
-declare function peg$parse(input: string, options?: Partial<PegOptions> = {}): Partial<ODataQuery>;
+declare function peg$parse(input: string, options?: Partial<PegOptions>): Partial<ODataQuery>;
 export { peg$SyntaxError as SyntaxError, peg$parse as parse };
