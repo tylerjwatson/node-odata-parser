@@ -1,6 +1,6 @@
 {
   "name": "@rapid/odata-parser",
-  "version": "1.4.4",
+  "version": "1.4.5",
   "description": "OData query string parser",
   "main": "lib/index.js",
   "types": "lib/odata-parser.d.ts",
