@@ -1,8 +1,9 @@
 {
-  "name": "odata-parser",
-  "version": "1.4.1",
+  "name": "@rapid/odata-parser",
+  "version": "1.4.3",
   "description": "OData query string parser",
   "main": "lib/index.js",
+  "types": "lib/odata-parser.d.ts",
   "scripts": {
     "test": "rm -f lib/odata-parser.js && npm run-script prepare && mocha -R spec",
     "testnew": "rm -f lib/odata-parser.js && npm run-script prepare && mocha -R spec",
@@ -10,7 +11,7 @@
   },
   "dependencies": {},
   "devDependencies": {
-    "mocha": "2.1.0",
+    "mocha": "^8.2.1",
     "pegjs": "^0.10.0"
   },
   "repository": {
