@@ -29,7 +29,7 @@ export interface LiteralNode extends ODataNode {
   value: any;
 }
 
-export interface FunctionCallNode extends ODataNode  {
+export interface FunctionCallNode extends ODataNode {
   type: "functioncall";
 
   /**
@@ -55,18 +55,27 @@ export interface ODataQuery {
   $skip: number;
 }
 
-declare function peg$SyntaxError(message: any, expected: any, found: any, location: any): void;
+export interface PegOptions {
+  startRule: string;
+}
+
+declare function peg$SyntaxError(
+  message: any,
+  expected: any,
+  found: any,
+  location: any
+): void;
 
 declare class peg$SyntaxError {
-    constructor(message: any, expected: any, found: any, location: any);
-    message: any;
-    expected: any;
-    found: any;
-    location: any;
-    name: string;
+  constructor(message: any, expected: any, found: any, location: any);
+  message: any;
+  expected: any;
+  found: any;
+  location: any;
+  name: string;
 }
 declare namespace peg$SyntaxError {
-    function buildMessage(expected: any, found: any): string;
+  function buildMessage(expected: any, found: any): string;
 }
-declare function peg$parse(input: any, options: any): Partial<ODataQuery>;
+declare function peg$parse(input: string, options?: Partial<PegOptions> = {}): Partial<ODataQuery>;
 export { peg$SyntaxError as SyntaxError, peg$parse as parse };
